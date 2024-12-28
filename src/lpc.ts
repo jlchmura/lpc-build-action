@@ -1,8 +1,10 @@
 import * as core from '@actions/core';
 import * as lpc from "lpc";
 import ansiStyles from "ansi-styles";
+import Convert from 'ansi-to-html';
 
 const problemMatcher = /^([^\s].*)[\(:](\d+)[,:](\d+)(?:\):\s+|\s+-\s+)(error|warning|info)\s+LPC(\d+)\s*:\s*(.*)$/;
+const ansiToHtml = new Convert();
 
 /**
  * The main function for the action.
@@ -69,11 +71,11 @@ export async function run(): Promise<void> {
   function onExecuteCommandMsg(msg: string, msgType?: lpc.ExecuteCommandMsgType) {
     switch (msgType) {
       case lpc.ExecuteCommandMsgType.Failure:
-        core.summary.addRaw(msg);
+        core.summary.addRaw(`<div>${ansiToHtml.toHtml(msg)}</div>`);
         core.setFailed(msg.trim());
         break;      
       case lpc.ExecuteCommandMsgType.Success:
-        core.summary.addRaw(msg);
+        core.summary.addRaw(`<div>${ansiToHtml.toHtml(msg)}</div>`);
         core.info(msg.trim());
         break;
       default:

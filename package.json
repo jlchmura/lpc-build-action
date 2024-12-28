@@ -23,7 +23,8 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0",
-    "ansi-styles": "^6.2.1"
+    "ansi-styles": "^6.2.1",
+    "ansi-to-html": "^0.7.2"
   },
   "devDependencies": {
     "@types/node": "^14.14.31",
