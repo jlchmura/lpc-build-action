@@ -14,7 +14,7 @@ jobs:
         
       - name: Build
         id: build
-        uses: jlchmura/lpc-build-action@latest
+        uses: jlchmura/lpc-build-action@main
         with:
           lpc-config: ${{ github.workspace }}/lpc-config.json        
 ```
