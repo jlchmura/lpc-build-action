@@ -56,8 +56,7 @@ export async function run(): Promise<void> {
 
     core.startGroup("Build Output");
     lpc.executeCommandLine(lpc.sys, ["--project", core.toPlatformPath(lpcConfig)], onExecuteCommandMsg);
-    core.endGroup();
-    
+        
     if (hadError) {
       core.setFailed(ansiStyles.color.redBright + "LPC build failed");
     } 
@@ -69,6 +68,8 @@ export async function run(): Promise<void> {
   core.summary.write();
 
   function onExecuteCommandMsg(msg: string, msgType?: lpc.ExecuteCommandMsgType) {
+    core.endGroup();
+
     switch (msgType) {
       case lpc.ExecuteCommandMsgType.Failure:
         core.summary.addRaw(`<div>${ansiToHtml.toHtml(msg)}</div>`);

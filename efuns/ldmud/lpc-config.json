@@ -1,0 +1,6 @@
+{
+    "driver": {
+        "type": "ldmud"
+    },
+    "include": ["./"]
+}
