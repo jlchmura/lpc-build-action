@@ -1,0 +1,33 @@
+{
+  "name": "lpc-build-action",
+  "version": "1.0.0",
+  "description": "LPC build action for Github",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -b && node ./build.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlchmura/lpc-build-action.git"
+  },
+  "keywords": [
+    "LPC"
+  ],
+  "author": "jlchmura",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jlchmura/lpc-build-action/issues"
+  },
+  "homepage": "https://github.com/jlchmura/lpc-build-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0",
+    "ansi-styles": "^6.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.31",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.4.5"
+  }
+}
