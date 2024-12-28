@@ -1,0 +1,4 @@
+*.js linguist-language=TypeScript
+**/*.json linguist-language=jsonc
+
+dist/** -diff linguist-generated=true
