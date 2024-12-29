@@ -1,6 +1,8 @@
 # lpc-build-action
 LPC Build Action for Github
 
+Parses and type checks your LPC code using the [LPC Language Server](https://github.com/jlchmura/lpc-language-server) compiler API.
+
 Sample action yaml:
 
 ```yml

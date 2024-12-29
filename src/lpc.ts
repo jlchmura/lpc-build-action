@@ -13,10 +13,10 @@ const ansiToHtml = new Convert();
 export async function run(): Promise<void> {
   try {
     // trap the console output - since lpc is so chatty
-    // console.log = () => {};
+    console.log = () => {};
     console.debug = () => {};
-    // console.info = () => {};
-    // console.warn = () => {};
+    console.info = () => {};
+    console.warn = () => {};
 
     console.log = (msg) => { core.info(msg) };
     console.info = (msg) => { core.info(msg) };
@@ -25,8 +25,6 @@ export async function run(): Promise<void> {
     lpc.sys.writeOutputIsTTY = () => true; // force color on
     
     let hadError = false;
-    // Set outputs for other workflow steps to use
-    // core.setOutput('time', new Date().toTimeString())
     
     // redirect lpc output to core.info
     lpc.sys.write = (message: string) => {
