@@ -4,7 +4,7 @@
   "description": "LPC build action for Github",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -b && node ./build.js",
+    "build": "tsc -b && node ./build.js && npm run efuns",
     "test": "echo \"Error: no test specified\" && exit 1",
     "efuns": "ncp ../lpc-language-server/efuns ./efuns"
   },
