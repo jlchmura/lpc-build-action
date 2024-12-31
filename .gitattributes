@@ -1,4 +1,7 @@
+*.c linguist-language=LPC
+*.h linguist-language=LPC
 *.js linguist-language=TypeScript
 **/*.json linguist-language=jsonc
 
+efun/** linguist-generated=true
 dist/** -diff linguist-generated=true
