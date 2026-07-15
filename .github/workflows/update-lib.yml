@@ -1,0 +1,79 @@
+# Rebuilds dist/ and efuns/ against the latest lpc-language-server release.
+# Note: GitHub disables cron schedules after ~60 days of repo inactivity.
+# If this workflow has gone stale, re-enable and/or trigger a manual run.
+name: Update bundled lpc-language-server
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'lpc-language-server ref to build (tag/branch/sha)'
+        required: false
+        default: ''
+  schedule:
+    # check for a new language server release weekly
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout lpc-build-action
+        uses: actions/checkout@v4
+        with:
+          path: lpc-build-action
+
+      - name: Resolve latest lpc-language-server release tag
+        id: lstag
+        run: |
+          if [ -n "${{ github.event.inputs.ref }}" ]; then
+            echo "ref=${{ github.event.inputs.ref }}" >> "$GITHUB_OUTPUT"
+          else
+            TAG=$(git ls-remote --tags --refs https://github.com/jlchmura/lpc-language-server.git 'v*' \
+              | awk -F/ '{print $NF}' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+            echo "ref=$TAG" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout lpc-language-server (${{ steps.lstag.outputs.ref }})
+        uses: actions/checkout@v4
+        with:
+          repository: jlchmura/lpc-language-server
+          ref: ${{ steps.lstag.outputs.ref }}
+          path: lpc-language-server
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install language server dependencies
+        working-directory: lpc-language-server
+        run: |
+          npm install --ignore-scripts --omit=dev --no-audit --no-fund
+          cd server && npm install --ignore-scripts --omit=dev --no-audit --no-fund
+
+      - name: Install action dependencies
+        working-directory: lpc-build-action
+        run: npm install --no-audit --no-fund
+
+      - name: Rebuild dist
+        working-directory: lpc-build-action
+        run: node build.js
+
+      - name: Update efun definitions
+        run: cp -a lpc-language-server/efuns/. lpc-build-action/efuns/
+
+      - name: Commit and push if changed
+        working-directory: lpc-build-action
+        run: |
+          git add dist efuns
+          if git diff --cached --quiet; then
+            echo "dist is already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Rebuild dist against lpc-language-server ${{ steps.lstag.outputs.ref }}"
+          git push
