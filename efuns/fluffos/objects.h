@@ -55,7 +55,7 @@ void set_hide( int flag );
  * 1 as 1.
  *
  */
-int set_heart_beat( int flag );
+void set_heart_beat( int flag );
 
 /**
  * save_object() - save the values of variables in an object into a file
@@ -68,6 +68,7 @@ int set_heart_beat( int flag );
  * save file will be compressed.
  *
  */
+varargs string save_object( int flag );
 varargs int save_object( string name, int flag );
 
 /**
@@ -95,6 +96,24 @@ varargs int restore_object( string name, int flag );
  *
  */
 void reload_object( object ob );
+
+/**
+ * recompile_object() - recompile an object's program in place
+ *
+ * Recompiles 'ob's program from its source file and swaps the fresh program
+ * into the live master copy and every clone sharing it.  The object is not
+ * destructed: its identity, name, inventory, shadows, interactive state,
+ * call_outs, and heart_beat are all preserved.  Global variables carry over
+ * by name -- the new program's __INIT runs first, then every variable whose
+ * name also existed in the old program keeps its old value; new variables
+ * keep their initializers and vanished names are dropped.
+ *
+ * 'ob' must be the master copy, not a clone, and must not currently be
+ * executing.  Returns the number of objects (master plus clones) whose
+ * program was updated.
+ *
+ */
+int recompile_object( object ob );
 
 /**
  * query_heart_beat() - query the status of an object's heartbeat
@@ -362,4 +381,22 @@ object *children( string name );
  *
  */
 varargs object *all_inventory( object ob );
+
+/**
+ * query_notify_destruct() - determine if an object will be notified when it is destructed
+ *
+ * The query_notify_destruct() efun is used to determine if an object will be
+ * notified when it is destructed. If the object is set to be notified, the
+ * function will return 1. If the object is not set to be notified, the
+ * function will return 0.
+ *
+ * If no argument is provided, the efun will query the current object. If an
+ * object is provided as an argument, the efun will query that object.
+ *
+ * Objects do not receive this notification by default. To receive the call to
+ * on_destruct(), the object must call set_notify_destruct(1) at some point
+ * during its lifetime.
+ *
+ */
+varargs int query_notify_destruct( object ob );
 
