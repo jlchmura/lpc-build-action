@@ -19,7 +19,7 @@ string zonetime(string timezone, int timestamp);
  * @param {object} ob - 要查询的对象
  * @param {int} flag (可选) 默认值为 0
  */
-mixed *variables(object ob, int flag);
+mixed *variables(object ob, void|int flag);
 
 /**
  * upper_case() - 返回一个字符串，源字符串中的每个字母都被大写。
@@ -145,8 +145,24 @@ mixed store_class_member(mixed instantiated_class, int class_element, mixed valu
  *
  * 随机重排列给定数组的元素（改变原数组!!!）
  *
+ * @template T
+ * @param {T*} arr 要打乱的数组
+ * @returns {T*} 打乱后的数组
  */
 mixed *shuffle(mixed *arr);
+
+/**
+ * set_os_env() - 设置或取消设置操作系统环境变量（需在允许列表中）
+ *
+ * 将操作系统环境变量 <name> 设置为 <value>，如果省略 'value'，
+ * 则取消设置该变量。成功时返回 1，操作系统级别失败时返回 0。
+ *
+ * 除非 <name> 出现在运行时配置选项 "writable os environment
+ * variables"（以冒号分隔，默认为空）中，否则写入将被拒绝。
+ * 可写的名称可以通过 get_os_env() 隐式读取。
+ *
+ */
+int set_os_env(string name, void|string value);
 
 /**
  * 
@@ -182,16 +198,16 @@ int send_nullbyte(object);
  * @param {int} sides - 每个骰子的面数
  * @param {int} bonus - （可选）加到掷骰上的奖励，默认为 0
  */
-int roll_MdN(int rolls, int sides, int bonus);
+int roll_MdN(int rolls, int sides, void|int bonus);
 
 /**
  * restore_from_string() - 类似于 restore_object()，但从字符串中恢复变量，其中字符串与 restore_object() 中的格式相同
  *
  * 使用字符串作为 restore_object 使用文件的含义
  * @param {string} str - 要恢复的字符串
- * @param {int} flag - 默认为 0
+ * @param {int} flag - （可选）默认为 0
  */
-void restore_from_string(string str, int flag);
+void restore_from_string(string str, void|int flag);
 
 /**
  * replaceable - 检查对象是否可被替换
@@ -319,8 +335,10 @@ varargs string query_num(int num, int many);
  * 返回当前 notify_fail 设置（funcp 或字符串）
  * #ifndef NO_ADD_ACTION
  *
+ * @returns {string|function} 当前的 notify_fail 设置，根据其设置方式，
+ * 可能是字符串或函数指针。
  */
-mixed query_notify_fail();
+string|function query_notify_fail();
 
 /**
  * query_ip_port - 返回连接的本地端口
@@ -423,8 +441,16 @@ object *named_livings( void );
  * 搜索 (int|float|string) 数组中的最小值。如果 flag 为 0 或
  * 被省略，则返回最小值，否则返回其首次出现的索引。
  *
+ * @template {int|float|string} T
+ * @param {T*} arr 要搜索的数组
+ * @returns {T} 数组中的最小值
  */
 mixed min(mixed * arr);
+
+/**
+ * min() - 当 flag 非零时，返回最小值首次出现的索引（int），
+ * 而不是最小值本身，因此返回类型保持为 `mixed`。
+ */
 mixed min(mixed * arr, int flag);
 
 /**
@@ -448,8 +474,16 @@ mapping memory_summary();
  * 搜索 (int|float|string) 数组中的最大值。如果 flag 为 0 或
  * 被省略，则返回最大值，否则返回其首次出现的索引。
  *
+ * @template {int|float|string} T
+ * @param {T*} arr 要搜索的数组
+ * @returns {T} 数组中的最大值
  */
-mixed max(mixed * arr); 
+mixed max(mixed * arr);
+
+/**
+ * max() - 当 flag 非零时，返回最大值首次出现的索引（int），
+ * 而不是最大值本身，因此返回类型保持为 `mixed`。
+ */
 mixed max(mixed * arr, int flag);
 
 /**
@@ -469,6 +503,33 @@ int is_daylight_savings_time(string, int);
  *
  */
 object *heart_beats( void );
+
+/**
+ * has_cycle() - 测试一个值是否包含引用循环
+ *
+ * 如果 <value> 的引用图中包含循环（可以到达自身的结构），返回 1，
+ * 否则返回 0。
+ *
+ * 遍历会跟随数组和类的元素、映射的键和值，以及函数指针捕获的
+ * 参数列表。对象被视为叶子节点。没有循环的共享不算循环，返回 0。
+ *
+ * 遍历是迭代式的，没有嵌套深度限制。
+ *
+ */
+int has_cycle(mixed value);
+
+/**
+ * get_os_env() - 读取操作系统环境变量（需在允许列表中）
+ *
+ * 返回操作系统环境变量 <name> 的值，如果该变量未设置则返回
+ * undefined。
+ *
+ * 除非 <name> 出现在运行时配置选项 "allowed os environment
+ * variables"（或 "writable os environment variables"，可写即可读）
+ * 中，否则访问将被拒绝。两个列表都以冒号分隔，默认为空。
+ *
+ */
+string get_os_env(string name);
 
 /**
  * get_garbage() - 获取所有没有环境或库存且不是影子对象的克隆。
@@ -512,7 +573,7 @@ object *get_garbage();
  * @param {object} ob - 要查询的对象
  * @param {int} flag (可选) 默认为0
  */
-mixed *functions(object ob, int flag);
+mixed *functions(object ob, void|int flag);
 
 /**
  * function_owner - 返回定义给定函数的对象
@@ -521,6 +582,23 @@ mixed *functions(object ob, int flag);
  *
  */
 object function_owner(function);
+
+/**
+ * find_cycles() - 定位一个值中的所有引用循环
+ *
+ * 对于 <value> 中每个闭合引用循环的槽位，返回一条索引路径。
+ * 空数组表示该值无循环。恰好断开返回的这些槽位即可使该值无循环；
+ * break_cycles() 可以一次性完成此操作。
+ *
+ * 路径语法，从最外层容器向内拼接：
+ * [3] 数组第 3 项，.2 类的第 2 个字段，["name"] 映射的值，
+ * [key <map>] 映射的键，(args) 函数指针捕获的参数列表。
+ *
+ * 循环中报告哪个槽位取决于遍历顺序，因此应将路径视为诊断信息，
+ * 而非稳定的约定。
+ *
+ */
+string *find_cycles(mixed value);
 
 /**
  * file_length - 返回文件的行数
@@ -612,6 +690,9 @@ void event(object | object * target, string event_name, mixed *args...);
  *
  * 返回给定数组的随机元素
  *
+ * @template T
+ * @param {T*} arr 要从中选取的数组
+ * @returns {T} 数组中的一个随机元素
  */
 mixed element_of(mixed *arr);
 
@@ -671,6 +752,9 @@ void debug_message(string msg);
  * 
  * 当你希望有通过引用传递的数据，但又不想改变原始数据时，这特别有用。
  *
+ * @template T
+ * @param {T} arg 要拷贝的值
+ * @returns {T} 与输入类型相同的深拷贝
  */
 mixed copy(mixed arg);
 
@@ -710,7 +794,24 @@ int compressedp(object ob);
  * // })
  *
  */
-mixed *classes(object ob, int verbose);
+mixed *classes(object ob, void|int verbose);
+
+/**
+ * break_cycles() - 安全地清除一个值中的所有引用循环
+ *
+ * 就地清除 <value> 中的所有引用循环，并返回被断开的边的数量。
+ * 由于复合值按引用传递，调用者的值（以及该值的所有其他持有者）
+ * 都会看到此更改。
+ *
+ * 只有闭合循环的回边会被处理：闭合循环的数组/类元素或映射的值
+ * 会被覆盖为 0；闭合循环的映射键会导致整个键/值节点被删除；
+ * 不属于循环的部分保持不变。断开一条边即可解开整个环，
+ * 因此 N 个容器组成的环计为 1，而非 N。
+ *
+ * 之后 has_cycle(value) 为 0，该值可以再次被保存、深拷贝和打印。
+ *
+ */
+int break_cycles(mixed value);
 
 /**
  * base_name - 返回不带对象ID (OID) 的基本名称
@@ -756,7 +857,8 @@ mixed assemble_class( mixed *elements );
 /**
  * abs() - 返回一个数的绝对值
  *
- * 返回提供的 <number> 的绝对值。
+ * 返回提供的 <number> 的绝对值。结果与参数的数值类型相同：
+ * int 返回 int，float 返回 float。
  *
  * int value = abs( 10 );      // 10
  * int value = abs( -10 );     // 10
@@ -764,4 +866,9 @@ mixed assemble_class( mixed *elements );
  * float value = abs( -3.14 ); // 3.140000
  *
  */
-mixed abs( int | float number );
+int abs( int number );
+
+/**
+ * abs() - 返回一个浮点数的绝对值。
+ */
+float abs( float number );
